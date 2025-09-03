@@ -1,0 +1,42 @@
+# CBEL Tracking System - Cloudflare Workers配置
+
+name = "cbel-tracking-proxy"
+main = "workers/proxy.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# 自定义域名配置
+routes = [
+  { pattern = "cbel-track.20990909.xyz/*", custom_domain = true }
+]
+
+# 环境变量
+[env.production.vars]
+ENVIRONMENT = "production"
+API_BASE_URL = "http://cbel.pgs-log.com/edi/pubTracking"
+ALLOWED_ORIGINS = "https://tracking.pgs-log.cn,http://localhost:3000"
+
+[env.development.vars]
+ENVIRONMENT = "development"
+API_BASE_URL = "http://cbel.pgs-log.com/edi/pubTracking"
+ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+
+# KV存储配置（如果需要缓存）
+# [[kv_namespaces]]
+# binding = "TRACKING_CACHE"
+# id = "your-kv-namespace-id"
+# preview_id = "your-preview-kv-namespace-id"
+
+# 资源限制
+[limits]
+cpu_ms = 50
+
+# 部署配置
+[build]
+command = ""
+cwd = ""
+watch_dir = "workers"
+
+# 触发器配置
+[triggers]
+crons = []
