@@ -36,6 +36,7 @@ export default function ConfigPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [password, setPassword] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0); // 用于强制重新渲染
 
   // 加载配置
   useEffect(() => {
@@ -99,14 +100,28 @@ export default function ConfigPage() {
       // 保存成功后重新加载配置，确保显示最新数据
       // 先清空配置状态，强制React重新渲染
       setConfig(null);
-      await new Promise(resolve => setTimeout(resolve, 100)); // 短暂延迟确保状态更新
+      setLoading(true); // 显示加载状态
+
+      // 添加随机参数避免缓存
+      const timestamp = Date.now();
+      console.log('添加时间戳避免缓存:', timestamp);
+
+      await new Promise(resolve => setTimeout(resolve, 200)); // 延长延迟确保状态更新
       await loadConfig();
-      console.log('配置重新加载完成');
+
+      // 强制重新渲染整个组件
+      setRefreshKey(prev => prev + 1);
+      console.log('配置重新加载完成，刷新键更新');
 
       // 清空密码输入框
       setPassword('');
 
-      setTimeout(() => setMessage(null), 3000);
+      // 如果重新加载后数据仍然不匹配，强制页面刷新
+      setTimeout(() => {
+        setMessage(null);
+        // 可选：如果问题持续存在，取消注释下面这行来强制页面刷新
+        // window.location.reload();
+      }, 3000);
     } catch (error) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : '保存配置失败' });
     } finally {
@@ -158,7 +173,7 @@ export default function ConfigPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div key={refreshKey} className="space-y-6">
       {/* 消息提示 */}
       {message && (
         <div className={`rounded-md p-4 ${

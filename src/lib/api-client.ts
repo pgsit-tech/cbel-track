@@ -242,7 +242,9 @@ export const configApi = {
    * 获取配置
    */
   async get() {
-    return apiClient.get('/api/config');
+    // 添加时间戳参数避免缓存
+    const timestamp = Date.now();
+    return apiClient.get(`/api/config?_t=${timestamp}`);
   },
 
   /**
