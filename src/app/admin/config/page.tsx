@@ -46,9 +46,32 @@ export default function ConfigPage() {
     try {
       setLoading(true);
       const data = await configApi.get();
-      setConfig(data);
+
+      // 验证和清理数据结构，确保与接口匹配
+      const cleanedData: SiteConfig = {
+        site: {
+          title: data.site?.title || 'CBEL 物流轨迹查询',
+          subtitle: data.site?.subtitle || '专业、快速、准确的物流跟踪服务',
+          logo: data.site?.logo || '/logo.png',
+          favicon: data.site?.favicon || '/favicon.ico',
+          description: data.site?.description || '专业的物流轨迹查询服务'
+        },
+        contact: {
+          phone: data.contact?.phone || '400-888-8888',
+          email: data.contact?.email || 'support@cbel.com',
+          address: data.contact?.address || '中国·上海',
+          workTime: data.contact?.workTime || '周一至周五 9:00-18:00'
+        },
+        footer: {
+          company: data.footer?.company || 'CBEL 物流科技有限公司',
+          copyright: data.footer?.copyright || '© 2025 CBEL 物流科技有限公司. 保留所有权利.'
+        }
+      };
+
+      setConfig(cleanedData);
     } catch (error) {
-      setMessage({ type: 'error', text: '加载配置失败' });
+      console.error('加载配置失败:', error);
+      setMessage({ type: 'error', text: `加载配置失败: ${error instanceof Error ? error.message : '未知错误'}` });
     } finally {
       setLoading(false);
     }
@@ -101,7 +124,14 @@ export default function ConfigPage() {
   if (!config) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">加载配置失败</p>
+        <div className="text-red-500 text-xl mb-4">⚠️</div>
+        <p className="text-gray-500 mb-4">配置加载失败</p>
+        <button
+          onClick={loadConfig}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          重新加载
+        </button>
       </div>
     );
   }
