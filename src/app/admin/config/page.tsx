@@ -50,23 +50,24 @@ export default function ConfigPage() {
       console.log('API返回的原始数据:', data);
 
       // 验证和清理数据结构，确保与接口匹配
+      // 使用 ?? 操作符只在值为 null 或 undefined 时使用默认值，空字符串会保留
       const cleanedData: SiteConfig = {
         site: {
-          title: data.site?.title || 'CBEL 物流轨迹查询',
-          subtitle: data.site?.subtitle || '专业、快速、准确的物流跟踪服务',
-          logo: data.site?.logo || '/logo.png',
-          favicon: data.site?.favicon || '/favicon.ico',
-          description: data.site?.description || '专业的物流轨迹查询服务'
+          title: data.site?.title ?? 'CBEL 物流轨迹查询',
+          subtitle: data.site?.subtitle ?? '专业、快速、准确的物流跟踪服务',
+          logo: data.site?.logo ?? '/logo.png',
+          favicon: data.site?.favicon ?? '/favicon.ico',
+          description: data.site?.description ?? '专业的物流轨迹查询服务'
         },
         contact: {
-          phone: data.contact?.phone || '400-888-8888',
-          email: data.contact?.email || 'support@cbel.com',
-          address: data.contact?.address || '中国·上海',
-          workTime: data.contact?.workTime || '周一至周五 9:00-18:00'
+          phone: data.contact?.phone ?? '400-888-8888',
+          email: data.contact?.email ?? 'support@cbel.com',
+          address: data.contact?.address ?? '中国·上海',
+          workTime: data.contact?.workTime ?? '周一至周五 9:00-18:00'
         },
         footer: {
-          company: data.footer?.company || 'CBEL 物流科技有限公司',
-          copyright: data.footer?.copyright || '© 2025 CBEL 物流科技有限公司. 保留所有权利.'
+          company: data.footer?.company ?? 'CBEL 物流科技有限公司',
+          copyright: data.footer?.copyright ?? '© 2025 CBEL 物流科技有限公司. 保留所有权利.'
         }
       };
 
