@@ -88,6 +88,13 @@ export default function ConfigPage() {
       setSaving(true);
       await configApi.save(config, password);
       setMessage({ type: 'success', text: '配置保存成功' });
+
+      // 保存成功后重新加载配置，确保显示最新数据
+      await loadConfig();
+
+      // 清空密码输入框
+      setPassword('');
+
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : '保存配置失败' });
