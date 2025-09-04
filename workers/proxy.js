@@ -485,8 +485,29 @@ async function handleConfigRequest(request, env) {
       }
 
       if (body.config) {
-        const success = await configManager.setConfig('site', body.config);
-        if (success) {
+        // 分别保存配置的各个部分
+        const config = body.config;
+        let allSuccess = true;
+
+        // 保存网站基本信息
+        if (config.site) {
+          const success = await configManager.setConfig('site', config.site);
+          if (!success) allSuccess = false;
+        }
+
+        // 保存联系信息
+        if (config.contact) {
+          const success = await configManager.setConfig('contact', config.contact);
+          if (!success) allSuccess = false;
+        }
+
+        // 保存页脚信息
+        if (config.footer) {
+          const success = await configManager.setConfig('footer', config.footer);
+          if (!success) allSuccess = false;
+        }
+
+        if (allSuccess) {
           return createSuccessResponse({ message: '配置保存成功' }, request);
         } else {
           return createErrorResponse('配置保存失败', 500);
