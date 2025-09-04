@@ -5,10 +5,10 @@ main = "workers/proxy.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# 自定义域名配置
-routes = [
-  { pattern = "cbel-track.20990909.xyz/*", custom_domain = true }
-]
+# 自定义域名配置 - 部署后在Dashboard中配置
+# routes = [
+#   { pattern = "cbel-track.20990909.xyz/*", custom_domain = true }
+# ]
 
 # 环境变量
 [env.production.vars]
@@ -33,9 +33,9 @@ database_id = "34fbae57-6572-4e7c-8158-7e826c7d06bd"
 # id = "your-kv-namespace-id"
 # preview_id = "your-preview-kv-namespace-id"
 
-# 资源限制
-[limits]
-cpu_ms = 50
+# 资源限制（免费计划不支持CPU限制）
+# [limits]
+# cpu_ms = 50
 
 # 部署配置
 [build]

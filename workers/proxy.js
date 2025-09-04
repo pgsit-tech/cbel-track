@@ -659,14 +659,3 @@ if (typeof addEventListener !== 'undefined') {
     event.respondWith(handleRequestWithErrorHandling(event.request, event.env || {}));
   });
 }
-
-// 如果在Node.js环境中运行（用于测试）
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    handleRequest,
-    handleAPIRequest,
-    handleCORS,
-    createSuccessResponse,
-    createErrorResponse
-  };
-}

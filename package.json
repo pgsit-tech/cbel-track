@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:static": "DEPLOY_TARGET=static next build",
-    "build:server": "DEPLOY_TARGET=server next build",
+    "build:static": "cross-env DEPLOY_TARGET=static next build",
+    "build:server": "cross-env DEPLOY_TARGET=server next build",
     "start": "next start",
     "export": "next export",
     "lint": "eslint",
