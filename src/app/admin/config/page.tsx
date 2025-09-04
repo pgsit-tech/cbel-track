@@ -71,7 +71,8 @@ export default function ConfigPage() {
       };
 
       console.log('清理后的配置数据:', cleanedData);
-      setConfig(cleanedData);
+      // 使用深拷贝确保React能检测到状态变化
+      setConfig(JSON.parse(JSON.stringify(cleanedData)));
     } catch (error) {
       console.error('加载配置失败:', error);
       setMessage({ type: 'error', text: `加载配置失败: ${error instanceof Error ? error.message : '未知错误'}` });
@@ -95,6 +96,9 @@ export default function ConfigPage() {
 
       console.log('配置保存成功，开始重新加载...');
       // 保存成功后重新加载配置，确保显示最新数据
+      // 先清空配置状态，强制React重新渲染
+      setConfig(null);
+      await new Promise(resolve => setTimeout(resolve, 100)); // 短暂延迟确保状态更新
       await loadConfig();
       console.log('配置重新加载完成');
 
@@ -112,15 +116,18 @@ export default function ConfigPage() {
   // 更新配置字段
   const updateConfig = (path: string[], value: any) => {
     if (!config) return;
-    
-    const newConfig = { ...config };
+
+    // 使用深拷贝确保React能检测到嵌套对象的变化
+    const newConfig = JSON.parse(JSON.stringify(config));
     let current: any = newConfig;
-    
+
     for (let i = 0; i < path.length - 1; i++) {
       current = current[path[i]];
     }
-    
+
     current[path[path.length - 1]] = value;
+    console.log('更新配置:', path, '=', value);
+    console.log('新配置对象:', newConfig);
     setConfig(newConfig);
   };
 
