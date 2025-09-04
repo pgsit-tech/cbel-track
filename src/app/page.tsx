@@ -483,53 +483,13 @@ export default function Home() {
           </section>
         )}
 
-        {/* Features */}
-        <section className="py-16">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">为什么选择我们</h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              专业的物流轨迹查询服务，为您提供最准确、最及时的货物跟踪信息
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">快速查询</h4>
-              <p className="text-gray-600">智能识别多种单号格式，秒级响应查询结果</p>
-            </div>
-
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">准确可靠</h4>
-              <p className="text-gray-600">直连官方API，确保数据准确性和实时性</p>
-            </div>
-
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm border">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">批量处理</h4>
-              <p className="text-gray-600">支持最多50个单号同时查询，提高工作效率</p>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -540,16 +500,6 @@ export default function Home() {
               <p className="text-gray-400">
                 专业的物流轨迹查询服务提供商，致力于为客户提供最优质的物流跟踪体验。
               </p>
-            </div>
-
-            <div>
-              <h5 className="text-lg font-semibold mb-4">快速链接</h5>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">服务条款</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">隐私政策</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">联系我们</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">技术支持</a></li>
-              </ul>
             </div>
 
             <div>

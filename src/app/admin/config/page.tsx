@@ -27,13 +27,7 @@ interface SiteConfig {
   footer: {
     company: string;
     copyright: string;
-    quickLinks: Array<{ name: string; url: string }>;
   };
-  features: Array<{
-    title: string;
-    description: string;
-    icon: string;
-  }>;
 }
 
 export default function ConfigPage() {
@@ -94,41 +88,7 @@ export default function ConfigPage() {
     setConfig(newConfig);
   };
 
-  // 添加快速链接
-  const addQuickLink = () => {
-    if (!config) return;
-    
-    const newConfig = { ...config };
-    newConfig.footer.quickLinks.push({ name: '', url: '' });
-    setConfig(newConfig);
-  };
 
-  // 删除快速链接
-  const removeQuickLink = (index: number) => {
-    if (!config) return;
-    
-    const newConfig = { ...config };
-    newConfig.footer.quickLinks.splice(index, 1);
-    setConfig(newConfig);
-  };
-
-  // 添加功能特色
-  const addFeature = () => {
-    if (!config) return;
-    
-    const newConfig = { ...config };
-    newConfig.features.push({ title: '', description: '', icon: 'default' });
-    setConfig(newConfig);
-  };
-
-  // 删除功能特色
-  const removeFeature = (index: number) => {
-    if (!config) return;
-    
-    const newConfig = { ...config };
-    newConfig.features.splice(index, 1);
-    setConfig(newConfig);
-  };
 
   if (loading) {
     return (
@@ -313,55 +273,7 @@ export default function ConfigPage() {
             </div>
           </div>
 
-          {/* 快速链接 */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                快速链接
-              </label>
-              <button
-                onClick={addQuickLink}
-                className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                <PlusIcon className="h-4 w-4 mr-1" />
-                添加链接
-              </button>
-            </div>
-            <div className="space-y-3">
-              {config.footer.quickLinks.map((link, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <input
-                    type="text"
-                    placeholder="链接名称"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={link.name}
-                    onChange={(e) => {
-                      const newLinks = [...config.footer.quickLinks];
-                      newLinks[index].name = e.target.value;
-                      updateConfig(['footer', 'quickLinks'], newLinks);
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="链接地址"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={link.url}
-                    onChange={(e) => {
-                      const newLinks = [...config.footer.quickLinks];
-                      newLinks[index].url = e.target.value;
-                      updateConfig(['footer', 'quickLinks'], newLinks);
-                    }}
-                  />
-                  <button
-                    onClick={() => removeQuickLink(index)}
-                    className="p-2 text-red-600 hover:text-red-800"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </div>
       </div>
 

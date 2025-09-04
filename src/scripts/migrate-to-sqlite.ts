@@ -21,31 +21,8 @@ const DEFAULT_CONFIG = {
   },
   footer: {
     company: 'CBEL 物流科技有限公司',
-    copyright: '© 2025 CBEL 物流科技有限公司. 保留所有权利.',
-    quickLinks: [
-      { name: '服务条款', url: '#' },
-      { name: '隐私政策', url: '#' },
-      { name: '联系我们', url: '#' },
-      { name: '技术支持', url: '#' }
-    ]
-  },
-  features: [
-    {
-      title: '快速查询',
-      description: '智能识别多种单号格式，秒级响应查询结果',
-      icon: 'lightning'
-    },
-    {
-      title: '准确可靠',
-      description: '直连官方API，确保数据准确性和实时性',
-      icon: 'shield'
-    },
-    {
-      title: '批量处理',
-      description: '支持最多50个单号同时查询，提高工作效率',
-      icon: 'batch'
-    }
-  ]
+    copyright: '© 2025 CBEL 物流科技有限公司. 保留所有权利.'
+  }
 };
 
 async function migrateData() {
