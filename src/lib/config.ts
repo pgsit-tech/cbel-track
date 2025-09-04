@@ -86,7 +86,7 @@ const defaultConfig: AppConfig = {
   
   api: {
     baseURL: process.env.DEPLOY_TARGET === 'static'
-      ? 'https://cbel-tracking-proxy.itsupport-5c8.workers.dev'
+      ? 'https://cbel-track.20990909.xyz'
       : '/api',
     officialAPI: 'http://cbel.pgs-log.com/edi/pubTracking',
     timeout: 30000,
