@@ -12,6 +12,7 @@ import {
   DocumentTextIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { statsApi, monitorApi } from '@/lib/api-client';
 
 // 模拟统计数据
 const mockStats = {
@@ -202,31 +203,21 @@ export default function AdminPage() {
       setLoading(true);
 
       // 并发加载统计数据和监控数据
-      const [statsResponse, monitorResponse] = await Promise.all([
-        fetch('/api/stats?type=summary'),
-        fetch('/api/monitor')
+      const [statsData, monitorData] = await Promise.all([
+        statsApi.getSummary(),
+        monitorApi.get()
       ]);
 
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        if (statsData.success) {
-          setStats({
-            totalQueries: statsData.data.total,
-            todayQueries: statsData.data.today,
-            successRate: 98.5, // 暂时使用固定值
-            avgResponseTime: 1.2, // 暂时使用固定值
-            activeUsers: 89, // 暂时使用固定值
-            systemStatus: 'healthy'
-          });
-        }
-      }
+      setStats({
+        totalQueries: statsData.total,
+        todayQueries: statsData.today,
+        successRate: 98.5, // 暂时使用固定值
+        avgResponseTime: 1.2, // 暂时使用固定值
+        activeUsers: 89, // 暂时使用固定值
+        systemStatus: 'healthy'
+      });
 
-      if (monitorResponse.ok) {
-        const monitorData = await monitorResponse.json();
-        if (monitorData.success) {
-          setMonitorData(monitorData.data);
-        }
-      }
+      setMonitorData(monitorData);
     } catch (error) {
       console.error('加载仪表板数据失败:', error);
     } finally {

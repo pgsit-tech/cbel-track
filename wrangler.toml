@@ -14,12 +14,18 @@ routes = [
 [env.production.vars]
 ENVIRONMENT = "production"
 API_BASE_URL = "http://cbel.pgs-log.com/edi/pubTracking"
-ALLOWED_ORIGINS = "https://tracking.pgs-log.cn,http://localhost:3000"
+ALLOWED_ORIGINS = "https://tracking.pgs-log.cn,https://cbel-track.pages.dev,http://localhost:3000"
 
 [env.development.vars]
 ENVIRONMENT = "development"
 API_BASE_URL = "http://cbel.pgs-log.com/edi/pubTracking"
 ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+
+# D1数据库配置
+[[d1_databases]]
+binding = "cbel_tracking"
+database_name = "cbel-tracking"
+database_id = "34fbae57-6572-4e7c-8158-7e826c7d06bd"
 
 # KV存储配置（如果需要缓存）
 # [[kv_namespaces]]

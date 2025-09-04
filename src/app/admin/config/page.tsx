@@ -8,6 +8,7 @@ import {
   PlusIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
+import { configApi } from '@/lib/api-client';
 
 interface SiteConfig {
   site: {
@@ -40,6 +41,7 @@ export default function ConfigPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [password, setPassword] = useState('');
 
   // 加载配置
   useEffect(() => {
@@ -49,14 +51,8 @@ export default function ConfigPage() {
   const loadConfig = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/config');
-      const data = await response.json();
-      
-      if (data.success) {
-        setConfig(data.data);
-      } else {
-        setMessage({ type: 'error', text: '加载配置失败' });
-      }
+      const data = await configApi.get();
+      setConfig(data);
     } catch (error) {
       setMessage({ type: 'error', text: '加载配置失败' });
     } finally {
@@ -66,28 +62,18 @@ export default function ConfigPage() {
 
   // 保存配置
   const saveConfig = async () => {
-    if (!config) return;
-    
+    if (!config || !password) {
+      setMessage({ type: 'error', text: '请输入管理员密码' });
+      return;
+    }
+
     try {
       setSaving(true);
-      const response = await fetch('/api/config', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setMessage({ type: 'success', text: '配置保存成功' });
-        setTimeout(() => setMessage(null), 3000);
-      } else {
-        setMessage({ type: 'error', text: data.error || '保存失败' });
-      }
+      await configApi.save(config, password);
+      setMessage({ type: 'success', text: '配置保存成功' });
+      setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      setMessage({ type: 'error', text: '保存配置失败' });
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : '保存配置失败' });
     } finally {
       setSaving(false);
     }

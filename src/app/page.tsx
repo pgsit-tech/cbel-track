@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Clock, MapPin, Package, Truck, Ship, Plane, FileText, CheckCircle } from 'lucide-react';
+import { trackingApi, configApi } from '@/lib/api-client';
 
 // 节点标签映射和图标配置
 const NODE_CONFIG = {
@@ -325,11 +326,8 @@ export default function Home() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const response = await fetch('/api/config');
-        const data = await response.json();
-        if (data.success) {
-          setSiteConfig(data.data);
-        }
+        const config = await configApi.get();
+        setSiteConfig(config);
       } catch (error) {
         console.error('加载配置失败:', error);
       }
@@ -356,9 +354,8 @@ export default function Home() {
 
         try {
           console.log(`查询单号: ${number}`);
-          // 使用本地API路由
-          const response = await fetch(`/api/tracking?trackingNumber=${encodeURIComponent(number)}`);
-          const result = await response.json();
+          // 使用新的API客户端
+          const result = await trackingApi.query(number);
 
           if (result.success && result.data && result.data.length > 0) {
             const trackingData = result.data[0]; // API返回的是数组，取第一个元素

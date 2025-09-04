@@ -10,6 +10,7 @@ import {
   ClockIcon,
   SignalIcon
 } from '@heroicons/react/24/outline';
+import { monitorApi } from '@/lib/api-client';
 
 interface EndpointStatus {
   name: string;
@@ -66,12 +67,8 @@ export default function MonitorPage() {
   const loadMonitorData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/monitor');
-      const data = await response.json();
-      
-      if (data.success) {
-        setMonitorData(data.data);
-      }
+      const data = await monitorApi.get();
+      setMonitorData(data);
     } catch (error) {
       console.error('加载监控数据失败:', error);
     } finally {

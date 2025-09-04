@@ -9,6 +9,7 @@ import {
   ClockIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import { statsApi } from '@/lib/api-client';
 
 interface StatsData {
   today: number;
@@ -40,12 +41,8 @@ export default function StatsPage() {
   const loadStatsData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/stats?type=summary');
-      const data = await response.json();
-      
-      if (data.success) {
-        setStatsData(data.data);
-      }
+      const data = await statsApi.getSummary();
+      setStatsData(data);
     } catch (error) {
       console.error('加载统计数据失败:', error);
     } finally {
@@ -55,12 +52,8 @@ export default function StatsPage() {
 
   const loadChartData = async () => {
     try {
-      const response = await fetch(`/api/stats?type=chart&period=${selectedPeriod}&limit=30`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setChartData(data.data);
-      }
+      const data = await statsApi.getChartData(selectedPeriod, 30);
+      setChartData(data);
     } catch (error) {
       console.error('加载图表数据失败:', error);
     }
