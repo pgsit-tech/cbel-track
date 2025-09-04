@@ -418,48 +418,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">C</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{siteTitle}</h1>
-                <p className="text-sm text-gray-600 hidden sm:block">{siteSubtitle}</p>
-              </div>
-            </div>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                首页
-              </a>
-              <a href="/help" className="text-gray-600 hover:text-primary transition-colors">
-                帮助
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
-        <section className="text-center py-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <section className="text-center py-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
             智能物流轨迹查询
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            支持多种单号格式识别，批量查询，实时跟踪您的货物状态
-          </p>
         </section>
 
         {/* Search Form */}
         <section>
           <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4 text-center">物流轨迹查询</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -474,32 +446,23 @@ export default function Home() {
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-center">
                 <button
                   type="button"
                   onClick={() => setTrackingNumbers('')}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   disabled={isLoading}
                 >
                   清空
                 </button>
                 <button
-                  type="button"
-                  onClick={() => setTrackingNumbers('CBEL123456789\nPO987654321\nTRK456789123')}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                  disabled={isLoading}
+                  type="submit"
+                  className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  disabled={isLoading || !trackingNumbers.trim()}
                 >
-                  示例
+                  {isLoading ? '查询中...' : '查询轨迹'}
                 </button>
               </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 disabled:opacity-50"
-                disabled={isLoading || !trackingNumbers.trim()}
-              >
-                {isLoading ? '查询中...' : '查询轨迹'}
-              </button>
             </form>
           </div>
         </section>
