@@ -47,6 +47,8 @@ export default function ConfigPage() {
       setLoading(true);
       const data = await configApi.get();
 
+      console.log('API返回的原始数据:', data);
+
       // 验证和清理数据结构，确保与接口匹配
       const cleanedData: SiteConfig = {
         site: {
@@ -68,6 +70,7 @@ export default function ConfigPage() {
         }
       };
 
+      console.log('清理后的配置数据:', cleanedData);
       setConfig(cleanedData);
     } catch (error) {
       console.error('加载配置失败:', error);
@@ -86,11 +89,14 @@ export default function ConfigPage() {
 
     try {
       setSaving(true);
+      console.log('保存前的配置:', config);
       await configApi.save(config, password);
       setMessage({ type: 'success', text: '配置保存成功' });
 
+      console.log('配置保存成功，开始重新加载...');
       // 保存成功后重新加载配置，确保显示最新数据
       await loadConfig();
+      console.log('配置重新加载完成');
 
       // 清空密码输入框
       setPassword('');
