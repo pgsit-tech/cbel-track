@@ -15,6 +15,7 @@ interface SiteConfig {
     title: string;
     subtitle: string;
     logo: string;
+    darkLogo: string;
     favicon: string;
     description: string;
   };
@@ -57,6 +58,7 @@ export default function ConfigPage() {
           title: data.site?.title ?? 'CBEL 物流轨迹查询',
           subtitle: data.site?.subtitle ?? '专业、快速、准确的物流跟踪服务',
           logo: data.site?.logo ?? '/logo.png',
+          darkLogo: data.site?.darkLogo ?? '',
           favicon: data.site?.favicon ?? '/favicon.ico',
           description: data.site?.description ?? '专业的物流轨迹查询服务'
         },
@@ -232,6 +234,18 @@ export default function ConfigPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={config.site.logo}
               onChange={(e) => updateConfig(['site', 'logo'], e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              深色Logo路径 (用于导航栏)
+            </label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={config.site.darkLogo}
+              onChange={(e) => updateConfig(['site', 'darkLogo'], e.target.value)}
+              placeholder="支持外部链接，如: https://example.com/dark-logo.png"
             />
           </div>
           <div>

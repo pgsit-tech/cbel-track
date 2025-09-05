@@ -108,3 +108,7 @@ temp/
 # Backup files
 *.bak
 *.backup
+
+# Python scripts (logo conversion tools)
+convert_logo.py
+*.py

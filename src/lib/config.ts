@@ -96,9 +96,9 @@ const defaultConfig: AppConfig = {
       backoff: 1.5,
     },
   },
-  
+
   domains: {
-    main: 'tracking.pgs-log.cn',
+    main: 'tracking.pgs-cbel.com',
     api: 'cbel-track.20990909.xyz',
   },
   

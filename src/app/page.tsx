@@ -321,6 +321,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [siteConfig, setSiteConfig] = useState<any>(null);
+  const [configLoading, setConfigLoading] = useState(true);
 
   // 加载网站配置
   useEffect(() => {
@@ -330,13 +331,56 @@ export default function Home() {
         setSiteConfig(config);
       } catch (error) {
         console.error('加载配置失败:', error);
+        // 即使加载失败，也设置一个默认配置以避免闪烁
+        setSiteConfig({
+          site: {
+            title: 'CBEL 物流轨迹查询',
+            subtitle: '专业、快速、准确的物流跟踪服务',
+            logo: '',
+            favicon: '',
+            description: '专业的物流轨迹查询服务'
+          },
+          contact: {
+            phone: '400-888-8888',
+            email: 'support@cbel.com',
+            address: '中国·上海',
+            workingHours: ''
+          },
+          footer: {
+            company: 'CBEL 物流科技',
+            copyright: '© 2025 CBEL 物流科技有限公司. 保留所有权利.'
+          }
+        });
+      } finally {
+        setConfigLoading(false);
       }
     };
     loadConfig();
   }, []);
 
   const siteTitle = siteConfig?.site?.title || 'CBEL 物流轨迹查询';
-  const siteSubtitle = siteConfig?.site?.subtitle || '专业、快速、准确的物流跟踪服务';
+  const siteSubtitle = siteConfig?.site?.subtitle || '';
+
+  // 动态设置页面标题
+  useEffect(() => {
+    document.title = siteTitle;
+  }, [siteTitle]);
+
+  // 动态设置favicon
+  useEffect(() => {
+    if (siteConfig?.site?.favicon) {
+      const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = siteConfig.site.favicon;
+      } else {
+        // 如果没有favicon link标签，创建一个
+        const newFavicon = document.createElement('link');
+        newFavicon.rel = 'icon';
+        newFavicon.href = siteConfig.site.favicon;
+        document.head.appendChild(newFavicon);
+      }
+    }
+  }, [siteConfig?.site?.favicon]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -416,17 +460,68 @@ export default function Home() {
     }
   };
 
+  // 如果配置还在加载中，显示加载界面
+  if (configLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-
+      {/* Top Navigation */}
+      <nav className="bg-white shadow-sm border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center space-x-4">
+            {siteConfig?.site?.darkLogo ? (
+              <img
+                src={siteConfig.site.darkLogo}
+                alt="Logo"
+                className="w-16 h-16 object-contain"
+                onError={(e) => {
+                  // 如果深色Logo加载失败，显示默认logo
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div
+              className="w-16 h-16 bg-gray-800 rounded-lg flex items-center justify-center"
+              style={{ display: siteConfig?.site?.darkLogo ? 'none' : 'flex' }}
+            >
+              <span className="text-white font-bold text-xl">C</span>
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold text-gray-900">{siteConfig?.footer?.company || 'CBEL 物流科技'}</h1>
+              {siteConfig?.site?.description && (
+                <p className="text-sm text-gray-600">{siteConfig.site.description}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
         <section className="text-center py-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">
-            智能物流轨迹查询
-          </h2>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              {siteTitle}
+            </h2>
+            {siteSubtitle && (
+              <p className="text-lg text-gray-600 mb-8 mx-auto">
+                {siteSubtitle}
+              </p>
+            )}
+          </div>
         </section>
 
         {/* Search Form */}
@@ -491,29 +586,29 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">C</span>
-                </div>
-                <span className="text-xl font-bold">CBEL 物流科技</span>
+              <div className="mb-4">
+                <h3 className="text-xl font-bold mb-2">{siteConfig?.footer?.company || 'CBEL 物流科技'}</h3>
+                {siteConfig?.site?.description && (
+                  <p className="text-gray-400">{siteConfig.site.description}</p>
+                )}
               </div>
-              <p className="text-gray-400">
-                专业的物流轨迹查询服务提供商，致力于为客户提供最优质的物流跟踪体验。
-              </p>
             </div>
 
             <div>
               <h5 className="text-lg font-semibold mb-4">联系信息</h5>
               <ul className="space-y-2 text-gray-400">
-                <li>邮箱: support@cbel.com</li>
-                <li>电话: 400-888-8888</li>
-                <li>地址: 中国·上海</li>
+                <li>邮箱: {siteConfig?.contact?.email || 'support@cbel.com'}</li>
+                <li>电话: {siteConfig?.contact?.phone || '400-888-8888'}</li>
+                <li>地址: {siteConfig?.contact?.address || '中国·上海'}</li>
+                {siteConfig?.contact?.workTime && (
+                  <li>工作时间: {siteConfig.contact.workTime}</li>
+                )}
               </ul>
             </div>
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 CBEL 物流科技有限公司. 保留所有权利.</p>
+            <p>{siteConfig?.footer?.copyright || '© 2025 CBEL 物流科技有限公司. 保留所有权利.'}</p>
           </div>
         </div>
       </footer>

@@ -14,7 +14,7 @@ routes = [
 [env.production.vars]
 ENVIRONMENT = "production"
 API_BASE_URL = "http://cbel.pgs-log.com/edi/pubTracking"
-ALLOWED_ORIGINS = "https://tracking.pgs-log.cn,https://cbel-track.pages.dev,http://localhost:3000"
+ALLOWED_ORIGINS = "https://tracking.pgs-cbel.com,https://cbel-track.pages.dev,http://localhost:3000"
 
 [env.development.vars]
 ENVIRONMENT = "development"
