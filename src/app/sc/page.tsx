@@ -23,20 +23,38 @@ const getStatusText = (status: string | number): string => {
   return statusMap[String(status)] || String(status);
 };
 
-// 简化的结果项组件 - 匹配截图样式
-function SimpleResultItem({ result, index }: { result: any; index: number }) {
-  const formatTime = (timeStr: string) => {
+// 完整的结果项组件 - 匹配截图样式
+function SimpleResultItem({ result }: { result: any; index: number }) {
+  // 安全获取字符串值
+  const safeString = (value: any): string => {
+    if (value === null || value === undefined) return 'N/A';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    return 'N/A'; // 对象类型返回N/A，避免渲染错误
+  };
+
+  // 安全格式化时间
+  const formatTime = (timeStr: any): string => {
     try {
-      const date = new Date(timeStr);
-      return date.toLocaleDateString('zh-CN').replace(/\//g, '-') + ' ' + date.toLocaleTimeString('zh-CN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
+      if (!timeStr) return 'N/A';
+      const timeString = String(timeStr);
+      const date = new Date(timeString);
+      if (isNaN(date.getTime())) return timeString;
+      return date.toLocaleDateString('zh-CN').replace(/\//g, '-') + ' ' +
+             date.toLocaleTimeString('zh-CN', {
+               hour: '2-digit',
+               minute: '2-digit',
+               second: '2-digit'
+             });
     } catch {
-      return timeStr;
+      return String(timeStr || 'N/A');
     }
   };
+
+  // 安全检查result结构
+  if (!result || typeof result !== 'object') {
+    return <div className="p-4 text-red-600">数据格式错误</div>;
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
@@ -53,10 +71,12 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
           {/* 运单号 */}
           <div className="flex-1">
             <h3 className="text-lg font-bold text-blue-600 mb-1">
-              {result.trackingNumber}
+              {safeString(result.trackingNumber)}
             </h3>
             <div className="text-sm text-gray-600">
-              状态: <span className="text-blue-600">{result.success ? getStatusText(result.data?.status || '运输中') : '查询失败'}</span>
+              状态: <span className="text-blue-600">
+                {result.success ? getStatusText(safeString(result.data?.status) || '运输中') : '查询失败'}
+              </span>
             </div>
           </div>
 
@@ -64,13 +84,13 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
           {result.success && result.data && (
             <div className="text-right text-sm">
               <div className="text-gray-600 mb-1">
-                系统单号: <span className="text-blue-600">{result.data.jobNum || 'N/A'}</span>
+                系统单号: <span className="text-blue-600">{safeString(result.data.jobNum)}</span>
               </div>
               <div className="text-gray-600 mb-1">
-                客户单号: <span className="text-blue-600">{result.trackingNumber}</span>
+                客户单号: <span className="text-blue-600">{safeString(result.trackingNumber)}</span>
               </div>
               <div className="text-gray-600">
-                件数: <span className="text-blue-600">{result.data.pkgNum || 'N/A'}</span>
+                件数: <span className="text-blue-600">{safeString(result.data.pkgNum)}</span>
               </div>
             </div>
           )}
@@ -82,11 +102,11 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">始发地:</span>
-                <span className="text-blue-600 ml-1">{result.data.depCountry || 'N/A'}</span>
+                <span className="text-blue-600 ml-1">{safeString(result.data.depCountry)}</span>
               </div>
               <div>
                 <span className="text-gray-600">目的港:</span>
-                <span className="text-blue-600 ml-1">{result.data.destCountry || 'N/A'}</span>
+                <span className="text-blue-600 ml-1">{safeString(result.data.destCountry)}</span>
               </div>
             </div>
           </div>
@@ -94,43 +114,56 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
       </div>
 
       {/* 节点信息区域 */}
-      {result.success && result.data && result.data.trackings && result.data.trackings.length > 0 ? (
+      {result.success && result.data ? (
         <div className="p-4">
-          <div className="space-y-3">
-            {result.data.trackings.map((tracking: any, trackingIndex: number) => (
-              <div key={trackingIndex} className="flex items-start gap-3">
-                {/* 蓝色圆形标记 */}
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                </div>
+          {result.data.trackings && Array.isArray(result.data.trackings) && result.data.trackings.length > 0 ? (
+            <div className="space-y-3">
+              {result.data.trackings.map((tracking: any, trackingIndex: number) => {
+                // 安全处理tracking对象
+                if (!tracking || typeof tracking !== 'object') {
+                  return null;
+                }
 
-                {/* 节点内容 */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-800 leading-relaxed">
-                    {tracking.context || '暂无描述'}
+                return (
+                  <div key={trackingIndex} className="flex items-start gap-3">
+                    {/* 蓝色圆形标记 */}
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    </div>
+
+                    {/* 节点内容 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-gray-800 leading-relaxed">
+                        {safeString(tracking.context) || '暂无描述'}
+                      </div>
+                      <div className="text-xs text-orange-500 mt-1">
+                        {formatTime(tracking.eventTime || tracking.time)}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-orange-500 mt-1">
-                    {formatTime(tracking.eventTime || tracking.time)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">
+              暂无轨迹信息
+            </div>
+          )}
 
           {/* 快递单号信息 */}
-          {result.data.expressNumbers && result.data.expressNumbers.length > 0 && (
+          {result.data.expressNumbers && Array.isArray(result.data.expressNumbers) && result.data.expressNumbers.length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="text-sm font-medium text-gray-700 mb-2">派送/小单动态</div>
               <div className="space-y-2">
-                {result.data.expressNumbers.map((expressNum: string, expIndex: number) => (
+                {result.data.expressNumbers.map((expressNum: any, expIndex: number) => (
                   <div key={expIndex} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span className="text-sm text-blue-600 hover:underline cursor-pointer">
-                      {expressNum}
+                      {safeString(expressNum)}
                     </span>
                     <span className="text-xs text-gray-500">({expIndex + 1})</span>
                     <a
-                      href={`https://www.17track.net/zh-cn/track#nums=${expressNum}`}
+                      href={`https://www.17track.net/zh-cn/track#nums=${safeString(expressNum)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-blue-500 hover:underline"
@@ -143,20 +176,18 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
             </div>
           )}
         </div>
-      ) : result.success && result.data ? (
-        <div className="p-4 text-center text-gray-500">
-          暂无轨迹信息
-        </div>
       ) : (
         <div className="p-4">
           <div className="text-sm text-red-600">
-            {result.error || '查询失败，请检查单号是否正确'}
+            {safeString(result.error) || '查询失败，请检查单号是否正确'}
           </div>
         </div>
       )}
     </div>
   );
 }
+
+
 
 export default function SimpleQuery() {
   const [trackingNumbers, setTrackingNumbers] = useState('');
@@ -236,6 +267,12 @@ export default function SimpleQuery() {
       // 等待所有查询完成
       const newResults = await Promise.all(queryPromises);
       console.log(`查询完成，成功: ${newResults.filter(r => r.success).length}，失败: ${newResults.filter(r => !r.success).length}`);
+
+      // 调试：检查结果结构
+      console.log('newResults:', newResults);
+      newResults.forEach((result, index) => {
+        console.log(`Result ${index}:`, result);
+      });
 
       // 将新结果添加到列表顶部
       setResults(prev => [...newResults, ...prev]);
@@ -337,9 +374,18 @@ export default function SimpleQuery() {
               </div>
             ) : (
               <div className="space-y-4">
-                {results.map((result, index) => (
-                  <SimpleResultItem key={`${result.trackingNumber}-${result.timestamp}`} result={result} index={index} />
-                ))}
+                {results.map((result, index) => {
+                  try {
+                    return <SimpleResultItem key={`result-${index}-${Date.now()}`} result={result} index={index} />;
+                  } catch (error) {
+                    console.error('渲染错误:', error, 'result:', result);
+                    return (
+                      <div key={`error-${index}`} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="text-red-600">渲染错误: {String(error)}</div>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             )}
           </div>
