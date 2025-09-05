@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 根据环境决定是否使用静态导出
-  ...(process.env.NODE_ENV === 'production' && process.env.BUILD_MODE === 'static' ? {
+  // 生产环境使用静态导出，开发环境支持API路由
+  ...(process.env.NODE_ENV === 'production' ? {
     output: 'export',
     trailingSlash: true,
     images: {
