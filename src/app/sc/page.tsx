@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, RotateCcw, CheckCircle } from 'lucide-react';
+import { Search, RotateCcw, CheckCircle, ChevronRight, X } from 'lucide-react';
 import { trackingApi } from '@/lib/api-client';
 
 // 状态映射函数
@@ -24,7 +24,14 @@ const getStatusText = (status: string | number): string => {
 };
 
 // 完整的结果项组件 - 匹配截图样式
-function SimpleResultItem({ result }: { result: any; index: number }) {
+function SimpleResultItem({
+  result,
+  onExpressClick
+}: {
+  result: any;
+  index: number;
+  onExpressClick: (expressNumber: string) => void;
+}) {
   // 安全获取字符串值
   const safeString = (value: any): string => {
     if (value === null || value === undefined) return 'N/A';
@@ -157,8 +164,17 @@ function SimpleResultItem({ result }: { result: any; index: number }) {
               <div className="space-y-2">
                 {result.data.expressNumbers.map((expressNum: any, expIndex: number) => (
                   <div key={expIndex} className="flex items-center gap-2">
+                    <button
+                      onClick={() => onExpressClick(safeString(expressNum))}
+                      className="flex-shrink-0 text-gray-400 hover:text-blue-600 transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-blue-600 hover:underline cursor-pointer">
+                    <span
+                      className="text-sm text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => onExpressClick(safeString(expressNum))}
+                    >
                       {safeString(expressNum)}
                     </span>
                     <span className="text-xs text-gray-500">({expIndex + 1})</span>
@@ -187,12 +203,100 @@ function SimpleResultItem({ result }: { result: any; index: number }) {
   );
 }
 
+// 快递详细轨迹模态框组件
+function ExpressDetailModal({ expressNumber, isOpen, onClose }: {
+  expressNumber: string;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [detailData, setDetailData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
+  React.useEffect(() => {
+    if (isOpen && expressNumber) {
+      fetchExpressDetail();
+    }
+  }, [isOpen, expressNumber]);
+
+  const fetchExpressDetail = async () => {
+    setLoading(true);
+    try {
+      // 调用API获取快递详细信息
+      const response = await fetch(`/api/express-detail?number=${expressNumber}`);
+      const data = await response.json();
+      setDetailData(data);
+    } catch (error) {
+      console.error('获取快递详情失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+        {/* 头部 */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="text-lg font-semibold">订单轨迹</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* 内容 */}
+        <div className="p-4 overflow-y-auto max-h-[60vh]">
+          {loading ? (
+            <div className="text-center py-8">加载中...</div>
+          ) : detailData ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-gray-600">跟踪号:</span>
+                <span className="font-medium">{expressNumber}</span>
+                <span className="text-green-600">已送达</span>
+              </div>
+
+              {detailData.trackings?.map((tracking: any, index: number) => (
+                <div key={index} className="flex items-start gap-3 pb-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-gray-800">
+                      {tracking.step || '运输'}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {tracking.location} {tracking.description}
+                    </div>
+                    <div className="text-xs text-orange-500 mt-1">
+                      {tracking.time}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">暂无详细信息</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SimpleQuery() {
   const [trackingNumbers, setTrackingNumbers] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [selectedExpress, setSelectedExpress] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 处理快递单号点击
+  const handleExpressClick = (expressNumber: string) => {
+    setSelectedExpress(expressNumber);
+    setIsModalOpen(true);
+  };
 
   // 解析输入的单号，支持换行和逗号分隔
   const parseTrackingNumbers = (input: string): string[] => {
@@ -391,7 +495,7 @@ export default function SimpleQuery() {
               <div className="space-y-4">
                 {results.map((result, index) => {
                   try {
-                    return <SimpleResultItem key={`result-${index}-${Date.now()}`} result={result} index={index} />;
+                    return <SimpleResultItem key={`result-${index}-${Date.now()}`} result={result} index={index} onExpressClick={handleExpressClick} />;
                   } catch (error) {
                     console.error('渲染错误:', error, 'result:', result);
                     return (
@@ -406,6 +510,13 @@ export default function SimpleQuery() {
           </div>
         </div>
       </div>
+
+      {/* 快递详细轨迹模态框 */}
+      <ExpressDetailModal
+        expressNumber={selectedExpress}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

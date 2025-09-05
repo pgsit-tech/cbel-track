@@ -1,14 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 默认使用静态导出模式
-  output: 'export',
-
-  // 静态导出必需配置
-  trailingSlash: true,
-  images: {
-    unoptimized: true
-  },
+  // 根据环境决定是否使用静态导出
+  ...(process.env.NODE_ENV === 'production' && process.env.BUILD_MODE === 'static' ? {
+    output: 'export',
+    trailingSlash: true,
+    images: {
+      unoptimized: true
+    },
+  } : {}),
 
   // 通用配置
   reactStrictMode: true,
