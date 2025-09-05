@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, CheckCircle, Clock, MapPin, Package } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, RotateCcw, CheckCircle } from 'lucide-react';
 import { trackingApi } from '@/lib/api-client';
 
 // 状态映射函数
@@ -116,6 +116,32 @@ function SimpleResultItem({ result, index }: { result: any; index: number }) {
               </div>
             ))}
           </div>
+
+          {/* 快递单号信息 */}
+          {result.data.expressNumbers && result.data.expressNumbers.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="text-sm font-medium text-gray-700 mb-2">派送/小单动态</div>
+              <div className="space-y-2">
+                {result.data.expressNumbers.map((expressNum: string, expIndex: number) => (
+                  <div key={expIndex} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-blue-600 hover:underline cursor-pointer">
+                      {expressNum}
+                    </span>
+                    <span className="text-xs text-gray-500">({expIndex + 1})</span>
+                    <a
+                      href={`https://www.17track.net/zh-cn/track#nums=${expressNum}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-500 hover:underline"
+                    >
+                      17TRACK
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : result.success && result.data ? (
         <div className="p-4 text-center text-gray-500">
@@ -152,14 +178,12 @@ export default function SimpleQuery() {
 
     try {
       const numbers = parseTrackingNumbers(trackingNumbers);
-      const newResults = [];
+      console.log(`开始并发查询 ${numbers.length} 个单号:`, numbers);
 
-      // 逐个查询每个单号
-      for (let i = 0; i < numbers.length; i++) {
-        const number = numbers[i];
-        console.log(`查询单号: ${number}`);
-
+      // 并发查询所有单号
+      const queryPromises = numbers.map(async (number) => {
         try {
+          console.log(`查询单号: ${number}`);
           const result: any = await trackingApi.query(number);
 
           if (result.success && result.data && result.data.length > 0) {
@@ -168,7 +192,7 @@ export default function SimpleQuery() {
               ? trackingData.trackings[trackingData.trackings.length - 1]
               : null;
 
-            const newResult = {
+            return {
               trackingNumber: number,
               success: true,
               data: {
@@ -181,40 +205,37 @@ export default function SimpleQuery() {
                 pkgNum: trackingData.pkgNum,
                 carrier: trackingData.carrier,
                 trackings: trackingData.trackings || [],
+                // 检查是否有快递单号信息
+                expressNumbers: trackingData.expressNumbers || trackingData.subTrackings || [],
                 latestEvent: latestTracking?.context || '暂无最新动态'
               },
               error: null,
               timestamp: Date.now()
             };
-
-            newResults.push(newResult);
           } else {
-            const errorResult = {
+            return {
               trackingNumber: number,
               success: false,
               data: null,
               error: result.error || '未找到该单号的物流信息',
               timestamp: Date.now()
             };
-            newResults.push(errorResult);
           }
         } catch (error) {
           console.error(`查询单号 ${number} 失败:`, error);
-          const errorResult = {
+          return {
             trackingNumber: number,
             success: false,
             data: null,
             error: '网络错误或服务不可用',
             timestamp: Date.now()
           };
-          newResults.push(errorResult);
         }
+      });
 
-        // 添加延迟避免请求过快
-        if (i < numbers.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      }
+      // 等待所有查询完成
+      const newResults = await Promise.all(queryPromises);
+      console.log(`查询完成，成功: ${newResults.filter(r => r.success).length}，失败: ${newResults.filter(r => !r.success).length}`);
 
       // 将新结果添加到列表顶部
       setResults(prev => [...newResults, ...prev]);
