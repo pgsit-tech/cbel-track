@@ -219,6 +219,9 @@ export default function SimpleQuery() {
 
           if (result.success && result.data && result.data.length > 0) {
             const trackingData = result.data[0];
+
+
+
             const latestTracking = trackingData.trackings && trackingData.trackings.length > 0
               ? trackingData.trackings[trackingData.trackings.length - 1]
               : null;
@@ -236,8 +239,24 @@ export default function SimpleQuery() {
                 pkgNum: trackingData.pkgNum,
                 carrier: trackingData.carrier,
                 trackings: trackingData.trackings || [],
-                // 检查是否有快递单号信息
-                expressNumbers: trackingData.expressNumbers || trackingData.subTrackings || [],
+                // 检查是否有快递单号信息 - 重点处理subTrackings
+                expressNumbers: (() => {
+                  // 优先处理subTrackings数组
+                  if (trackingData.subTrackings && Array.isArray(trackingData.subTrackings)) {
+                    return trackingData.subTrackings.map((sub: any) => {
+                      // 尝试不同的字段名来获取快递单号
+                      return sub.trackingNumber || sub.trackingNum || sub.expressNumber || sub.number || sub.id || String(sub);
+                    }).filter(Boolean);
+                  }
+
+                  // 其他可能的字段
+                  return trackingData.expressNumbers ||
+                         trackingData.expressNums ||
+                         trackingData.deliveryNumbers ||
+                         trackingData.courierNumbers ||
+                         trackingData.lastMileNumbers ||
+                         [];
+                })(),
                 latestEvent: latestTracking?.context || '暂无最新动态'
               },
               error: null,
@@ -268,11 +287,7 @@ export default function SimpleQuery() {
       const newResults = await Promise.all(queryPromises);
       console.log(`查询完成，成功: ${newResults.filter(r => r.success).length}，失败: ${newResults.filter(r => !r.success).length}`);
 
-      // 调试：检查结果结构
-      console.log('newResults:', newResults);
-      newResults.forEach((result, index) => {
-        console.log(`Result ${index}:`, result);
-      });
+
 
       // 将新结果添加到列表顶部
       setResults(prev => [...newResults, ...prev]);
